@@ -1,4 +1,5 @@
 using IncotradeBackend.Infrastructure.Database;
+using IncotradeBackend.Infrastructure.Dependencies;
 using Microsoft.EntityFrameworkCore;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -10,6 +11,9 @@ builder.Services.AddDbContext<AppDbContext>(options =>
         builder.Configuration.GetConnectionString("Dev")
     )
 );
+
+// Register Dependencies
+builder.Services.AddSecurityDependency();
 
 // Register Swagger/OpenAPI
 builder.Services.AddOpenApi();
