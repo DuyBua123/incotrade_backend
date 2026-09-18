@@ -1,7 +1,5 @@
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
+
+using IncotradeBackend.Infrastructure.Database.Model;
 using Microsoft.EntityFrameworkCore;
 
 namespace IncotradeBackend.Infrastructure.Database
@@ -13,6 +11,7 @@ namespace IncotradeBackend.Infrastructure.Database
 
 
         // Db Set
+        public DbSet<User> Users { set; get; }
         
     }
 }
