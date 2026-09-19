@@ -1,5 +1,6 @@
 
 using IncotradeBackend.Application.Authentication.Login;
+using IncotradeBackend.Application.Authentication.Me;
 using IncotradeBackend.Application.Authentication.RefreshToken;
 using IncotradeBackend.Infrastructure.Api;
 using IncotradeBackend.Infrastructure.Exceptions;
@@ -16,15 +17,18 @@ namespace IncotradeBackend.Presentation.Authentication
     {
 
         private readonly LoginUseCase _loginUseCase;
+        private readonly MeUseCase _meUseCase;
         private readonly RefreshTokenUseCase _refreshTokenUseCase;
 
 
         public AuthenticationController(
             LoginUseCase loginUseCase,
+            MeUseCase meUseCase,
             RefreshTokenUseCase refreshTokenUseCase
         )
         {
             _loginUseCase = loginUseCase;
+            _meUseCase = meUseCase;
             _refreshTokenUseCase = refreshTokenUseCase;
         }
 
@@ -47,6 +51,22 @@ namespace IncotradeBackend.Presentation.Authentication
 
             return Ok(SuccessResponse<LoginResponse>
                 .Success("Đăng nhập thành công.", 
+                response)
+            );
+        }
+
+        [HttpGet("me")]
+        public async Task<IActionResult> Me()
+        {
+            string? refreshToken = Request.Cookies["refreshToken"];
+
+            var command = MeMapper.ToCommand(refreshToken);
+            var result = await _meUseCase.ExecuteAsync(command);
+
+            var response = MeMapper.ToResponse(result);
+
+            return Ok(SuccessResponse<MeResponse>
+                .Success("Lấy Access Token và Thông tin người dùng thành công.",
                 response)
             );
         }
