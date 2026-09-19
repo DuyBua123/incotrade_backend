@@ -1,5 +1,6 @@
 
 using IncotradeBackend.Application.Authentication.Login;
+using IncotradeBackend.Application.Authentication.RefreshToken;
 using IncotradeBackend.Infrastructure.Api;
 using IncotradeBackend.Infrastructure.Exceptions;
 using IncotradeBackend.Infrastructure.Mapper.Authentication;
@@ -15,13 +16,16 @@ namespace IncotradeBackend.Presentation.Authentication
     {
 
         private readonly LoginUseCase _loginUseCase;
+        private readonly RefreshTokenUseCase _refreshTokenUseCase;
 
 
         public AuthenticationController(
-            LoginUseCase loginUseCase
+            LoginUseCase loginUseCase,
+            RefreshTokenUseCase refreshTokenUseCase
         )
         {
             _loginUseCase = loginUseCase;
+            _refreshTokenUseCase = refreshTokenUseCase;
         }
 
 
@@ -43,6 +47,22 @@ namespace IncotradeBackend.Presentation.Authentication
 
             return Ok(SuccessResponse<LoginResponse>
                 .Success("Đăng nhập thành công.", 
+                response)
+            );
+        }
+
+        [HttpPost("refresh-token")]
+        public async Task<IActionResult> RefreshToken()
+        {
+            string? refreshToken = Request.Cookies["refreshToken"];
+
+            var command = RefreshTokenMapper.ToCommand(refreshToken);
+            var result = await _refreshTokenUseCase.ExecuteAsync(command);
+
+            var response = RefreshTokenMapper.ToResponse(result);
+
+            return Ok(SuccessResponse<RefreshTokenResponse>
+                .Success("Refresh token thành công.",
                 response)
             );
         }

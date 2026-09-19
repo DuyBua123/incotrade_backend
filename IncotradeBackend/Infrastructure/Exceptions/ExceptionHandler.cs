@@ -1,7 +1,4 @@
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
+
 using IncotradeBackend.Infrastructure.Api;
 using Microsoft.AspNetCore.Diagnostics;
 
@@ -36,6 +33,18 @@ namespace IncotradeBackend.Infrastructure.Exceptions
                         FailureResponse<string>.Failure(
                             "Email hoặc mật khẩu không hợp lệ",
                             ErrorCodes.INVALID_CREDENTIAL_ERROR,
+                            ex.Error
+                        ), cancellationToken);
+
+                    return true;
+
+                case InvalidRefreshTokenException ex:
+                    context.Response.StatusCode = StatusCodes.Status401Unauthorized;
+
+                    await context.Response.WriteAsJsonAsync(
+                        FailureResponse<string>.Failure(
+                            "Refresh token không hợp lệ.",
+                            ErrorCodes.REFRESH_TOKEN_ERROR,
                             ex.Error
                         ), cancellationToken);
 
