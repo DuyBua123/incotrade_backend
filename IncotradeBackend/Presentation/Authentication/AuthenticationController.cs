@@ -16,6 +16,9 @@ namespace IncotradeBackend.Presentation.Authentication
     [Route("api/auth")]
     public class AuthenticationController : ControllerBase
     {
+        private const string RefreshTokenCookieName = "refreshToken";
+        private const string RefreshTokenCookiePath = "/";
+        private const string LegacyRefreshTokenCookiePath = "/api/auth";
 
         private readonly LoginUseCase _loginUseCase;
         private readonly MeUseCase _meUseCase;
@@ -51,6 +54,7 @@ namespace IncotradeBackend.Presentation.Authentication
 
             var response = LoginMapper.ToResponse(result);
 
+            DeleteLegacyRefreshTokenCookies();
             AppendRefreshTokenCookie(result.RefreshToken, result.RefreshTokenExpiresAt);
 
             return Ok(SuccessResponse<LoginResponse>
@@ -62,7 +66,7 @@ namespace IncotradeBackend.Presentation.Authentication
         [HttpGet("me")]
         public async Task<IActionResult> Me()
         {
-            string? refreshToken = Request.Cookies["refreshToken"];
+            string? refreshToken = Request.Cookies[RefreshTokenCookieName];
 
             var command = MeMapper.ToCommand(refreshToken);
             var result = await _meUseCase.ExecuteAsync(command);
@@ -78,7 +82,7 @@ namespace IncotradeBackend.Presentation.Authentication
         [HttpPost("refresh-token")]
         public async Task<IActionResult> RefreshToken()
         {
-            string? refreshToken = Request.Cookies["refreshToken"];
+            string? refreshToken = Request.Cookies[RefreshTokenCookieName];
 
             var command = RefreshTokenMapper.ToCommand(refreshToken);
             var result = await _refreshTokenUseCase.ExecuteAsync(command);
@@ -94,7 +98,7 @@ namespace IncotradeBackend.Presentation.Authentication
         [HttpPost("logout")]
         public async Task<IActionResult> Logout()
         {
-            string? refreshToken = Request.Cookies["refreshToken"];
+            string? refreshToken = Request.Cookies[RefreshTokenCookieName];
 
             var command = LogoutMapper.ToCommand(refreshToken);
             await _logoutUseCase.ExecuteAsync(command);
@@ -114,14 +118,14 @@ namespace IncotradeBackend.Presentation.Authentication
             DateTimeOffset refreshTokenExpiresAt)
         {
             HttpContext.Response.Cookies.Append(
-                "refreshToken",
+                RefreshTokenCookieName,
                 refreshToken,
                 new CookieOptions
                 {
                     HttpOnly = true,
                     Secure = true, // HTTPS only
                     SameSite = SameSiteMode.Lax,
-                    Path = "/",
+                    Path = RefreshTokenCookiePath,
                     Expires = refreshTokenExpiresAt
                 }
             );
@@ -129,7 +133,26 @@ namespace IncotradeBackend.Presentation.Authentication
 
         private void DeleteRefreshTokenCookie()
         {
-            HttpContext.Response.Cookies.Delete("refreshToken");
+            HttpContext.Response.Cookies.Delete(
+                RefreshTokenCookieName,
+                new CookieOptions
+                {
+                    Path = RefreshTokenCookiePath
+                }
+            );
+
+            DeleteLegacyRefreshTokenCookies();
+        }
+
+        private void DeleteLegacyRefreshTokenCookies()
+        {
+            HttpContext.Response.Cookies.Delete(
+                RefreshTokenCookieName,
+                new CookieOptions
+                {
+                    Path = LegacyRefreshTokenCookiePath
+                }
+            );
         }
         
     }
