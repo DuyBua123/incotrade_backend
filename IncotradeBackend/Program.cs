@@ -2,7 +2,9 @@ using IncotradeBackend.Infrastructure.Database;
 using IncotradeBackend.Infrastructure.Database.Model;
 using IncotradeBackend.Infrastructure.Database.Seed;
 using IncotradeBackend.Infrastructure.Dependencies;
+using IncotradeBackend.Infrastructure.Exceptions;
 using Microsoft.AspNetCore.Identity;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -20,9 +22,19 @@ builder.Services.AddSingleton<PasswordHasher<User>>();
 
 // Register Dependencies
 builder.Services.AddSecurityDependency();
+builder.Services.AddAuthenticationDependencies(builder.Configuration);
 
 // Register Swagger/OpenAPI
 builder.Services.AddOpenApi();
+
+// Register Api Behavior
+builder.Services.Configure<ApiBehaviorOptions>(options =>
+{
+    options.InvalidModelStateResponseFactory = actionContext =>
+    {
+        throw new InputValidationException(actionContext.ModelState);
+    };
+});
 
 // Register Controller
 builder.Services.AddControllers();

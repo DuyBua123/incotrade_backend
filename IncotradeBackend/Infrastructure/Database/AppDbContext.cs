@@ -12,6 +12,7 @@ namespace IncotradeBackend.Infrastructure.Database
 
         // Db Set
         public DbSet<User> Users { set; get; }
+        public DbSet<LoginSession> LoginSessions { get; set; }
 
 
 
@@ -25,6 +26,10 @@ namespace IncotradeBackend.Infrastructure.Database
                 .Property(u => u.Role)
                 .HasConversion<string>();
 
+            // Configure LoginSession table
+            modelBuilder.Entity<LoginSession>()
+                .Property(ls => ls.RevokedReason)
+                .HasConversion<string>();
 
         }
         

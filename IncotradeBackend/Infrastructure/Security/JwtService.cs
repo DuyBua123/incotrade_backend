@@ -53,6 +53,29 @@ namespace IncotradeBackend.Infrastructure.Security
         {
             return Base64UrlEncoder.Encode(RandomNumberGenerator.GetBytes(64));
         }
+
+        public string HashRefreshToken(string refreshToken)
+        {
+            byte[] hashBytes = SHA256.HashData(Encoding.UTF8.GetBytes(refreshToken));
+
+            return Convert.ToHexString(hashBytes).ToLowerInvariant();
+        }
+
+        public DateTimeOffset GenerateAccessTokenExpiresAt()
+        {
+            return DateTimeOffset.FromUnixTimeSeconds(
+                    DateTimeOffset.UtcNow
+                        .AddMinutes(_configuration.GetValue<int>("Jwt:AccessTokenExpireMinutes"))
+                        .ToUnixTimeSeconds()); // Remove milisecond pars
+        } 
+
+        public DateTimeOffset GenerateRefreshTokenExpiresAt()
+        {
+            return DateTimeOffset.FromUnixTimeSeconds(
+                    DateTimeOffset.UtcNow
+                        .AddDays(_configuration.GetValue<int>("Jwt:RefreshTokenExpireDays"))
+                        .ToUnixTimeSeconds()); // Remove milisecond pars
+        }
         
     }
 }

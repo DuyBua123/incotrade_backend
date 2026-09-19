@@ -27,5 +27,10 @@ namespace IncotradeBackend.Infrastructure.Database.Model
 
         [Required]
         public DateTimeOffset CreatedAt { get; set; } = DateTimeOffset.UtcNow;
+
+
+        // Relationship
+        public ICollection<LoginSession> LoginSessions { get; set; } = [];
+
     }
 }
