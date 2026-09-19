@@ -1,5 +1,8 @@
 using IncotradeBackend.Infrastructure.Database;
+using IncotradeBackend.Infrastructure.Database.Model;
+using IncotradeBackend.Infrastructure.Database.Seed;
 using IncotradeBackend.Infrastructure.Dependencies;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -12,16 +15,20 @@ builder.Services.AddDbContext<AppDbContext>(options =>
     )
 );
 
+// Register Password Haasher
+builder.Services.AddSingleton<PasswordHasher<User>>();
+
 // Register Dependencies
 builder.Services.AddSecurityDependency();
 
 // Register Swagger/OpenAPI
 builder.Services.AddOpenApi();
 
-
 // Register Controller
 builder.Services.AddControllers();
 
+// Register Auto-run on Startup Service
+builder.Services.AddHostedService<PasswordGenerationService>();
 
 
 var app = builder.Build();
