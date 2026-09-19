@@ -121,7 +121,7 @@ namespace IncotradeBackend.Presentation.Authentication
                     HttpOnly = true,
                     Secure = true, // HTTPS only
                     SameSite = SameSiteMode.Lax,
-                    Path = "/api/auth",
+                    Path = "/",
                     Expires = refreshTokenExpiresAt
                 }
             );
@@ -129,15 +129,7 @@ namespace IncotradeBackend.Presentation.Authentication
 
         private void DeleteRefreshTokenCookie()
         {
-            HttpContext.Response.Cookies.Delete(
-                "refreshToken",
-                new CookieOptions
-                {
-                    Secure = true,
-                    SameSite = SameSiteMode.Lax,
-                    Path = "/api/auth"
-                }
-            );
+            HttpContext.Response.Cookies.Delete("refreshToken");
         }
         
     }

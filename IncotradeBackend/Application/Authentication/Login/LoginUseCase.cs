@@ -66,7 +66,8 @@ namespace IncotradeBackend.Application.Authentication.Login
             return LoginMapper.ToResult(
                 accessToken,
                 refreshToken,
-                refreshTokenExpiresAt);
+                refreshTokenExpiresAt,
+                user);
         }
 
 

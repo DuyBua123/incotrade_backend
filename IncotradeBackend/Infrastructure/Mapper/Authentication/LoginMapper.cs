@@ -1,6 +1,7 @@
 
 
 using IncotradeBackend.Application.Authentication.Login;
+using IncotradeBackend.Infrastructure.Database.Model;
 using IncotradeBackend.Presentation.Authentication.Request;
 using IncotradeBackend.Presentation.Authentication.Response;
 
@@ -20,13 +21,21 @@ namespace IncotradeBackend.Infrastructure.Mapper.Authentication
         public static LoginResult ToResult(
             string accessToken,
             string refreshToken,
-            DateTimeOffset refreshTokenExpiresAt)
+            DateTimeOffset refreshTokenExpiresAt,
+            User user)
         {
             return new LoginResult
             {
                 AccessToken = accessToken,
                 RefreshToken = refreshToken,
-                RefreshTokenExpiresAt = refreshTokenExpiresAt
+                RefreshTokenExpiresAt = refreshTokenExpiresAt,
+                User = new LoginUserResult
+                {
+                    Id = user.Id,
+                    FullName = user.FullName,
+                    Email = user.Email,
+                    Role = user.Role.ToString()
+                }
             };
         }
 
@@ -34,7 +43,14 @@ namespace IncotradeBackend.Infrastructure.Mapper.Authentication
         {
             return new LoginResponse
             {
-                AccessToken = result.AccessToken
+                AccessToken = result.AccessToken,
+                User = new LoginUserResponse
+                {
+                    Id = result.User.Id,
+                    FullName = result.User.FullName,
+                    Email = result.User.Email,
+                    Role = result.User.Role
+                }
             };
         }
     }
