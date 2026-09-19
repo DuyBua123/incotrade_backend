@@ -1,6 +1,7 @@
 
 using IncotradeBackend.Application.Authentication.Login;
 using IncotradeBackend.Infrastructure.Api;
+using IncotradeBackend.Infrastructure.Exceptions;
 using IncotradeBackend.Infrastructure.Mapper.Authentication;
 using IncotradeBackend.Presentation.Authentication.Request;
 using IncotradeBackend.Presentation.Authentication.Response;
@@ -27,6 +28,11 @@ namespace IncotradeBackend.Presentation.Authentication
         [HttpPost("login")]
         public async Task<IActionResult> Login([FromBody] LoginRequest request)
         {
+
+            if (!ModelState.IsValid)
+            {
+                throw new InputValidationException(ModelState);
+            }
 
             var command = LoginMapper.ToCommand(request);
             var result = await _loginUseCase.ExecuteAsync(command);

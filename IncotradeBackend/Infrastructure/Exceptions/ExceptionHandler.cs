@@ -20,22 +20,24 @@ namespace IncotradeBackend.Infrastructure.Exceptions
                 case InputValidationException ex:
                     context.Response.StatusCode = StatusCodes.Status400BadRequest;
 
-                    await context.Response.WriteAsJsonAsync(FailureResponse<IDictionary<string, string>>.Failure(
-                        "Kiểm tra dữ liệu đầu vào thất bại.",
-                        ErrorCodes.INPUT_VALIDATION_ERROR,
-                        ex.Errors
-                    ), cancellationToken);
+                    await context.Response.WriteAsJsonAsync(
+                        FailureResponse<IDictionary<string, string>>.Failure(
+                            "Kiểm tra dữ liệu đầu vào thất bại.",
+                            ErrorCodes.INPUT_VALIDATION_ERROR,
+                            ex.Errors
+                        ), cancellationToken);
 
                     return true;
 
                 case InvalidCredentialException ex:
                     context.Response.StatusCode = StatusCodes.Status401Unauthorized;
 
-                    await context.Response.WriteAsJsonAsync(FailureResponse<string>.Failure(
-                        "Email hoặc mật khẩu không hợp lệ",
-                        ErrorCodes.INPUT_VALIDATION_ERROR,
-                        ex.Error
-                    ), cancellationToken);
+                    await context.Response.WriteAsJsonAsync(
+                        FailureResponse<string>.Failure(
+                            "Email hoặc mật khẩu không hợp lệ",
+                            ErrorCodes.INVALID_CREDENTIAL_ERROR,
+                            ex.Error
+                        ), cancellationToken);
 
                     return true;
 
@@ -43,11 +45,12 @@ namespace IncotradeBackend.Infrastructure.Exceptions
                 case NotFoundException ex:
                     context.Response.StatusCode = StatusCodes.Status404NotFound;
 
-                    await context.Response.WriteAsJsonAsync(FailureResponse<string>.Failure(
-                        "Không tìm thấy.",
-                        ErrorCodes.NOT_FOUND_ERROR,
-                        ex.Message
-                    ), cancellationToken);
+                    await context.Response.WriteAsJsonAsync(
+                        FailureResponse<string>.Failure(
+                            "Không tìm thấy.",
+                            ErrorCodes.NOT_FOUND_ERROR,
+                            ex.Message
+                        ), cancellationToken);
 
                     return true;
 
