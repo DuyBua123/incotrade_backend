@@ -4,6 +4,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using FluentValidation;
 using IncotradeBackend.Application.Authentication.Login;
+using IncotradeBackend.Application.Authentication.Logout;
 using IncotradeBackend.Application.Authentication.Me;
 using IncotradeBackend.Application.Authentication.RefreshToken;
 using IncotradeBackend.Presentation.Authentication.Validator;
@@ -21,6 +22,7 @@ namespace IncotradeBackend.Infrastructure.Dependencies
             services.AddScoped<LoginUseCase>();
             services.AddScoped<MeUseCase>();
             services.AddScoped<RefreshTokenUseCase>();
+            services.AddScoped<LogoutUseCase>();
 
 
             return services;

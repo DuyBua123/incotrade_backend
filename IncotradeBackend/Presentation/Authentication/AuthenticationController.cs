@@ -1,5 +1,6 @@
 
 using IncotradeBackend.Application.Authentication.Login;
+using IncotradeBackend.Application.Authentication.Logout;
 using IncotradeBackend.Application.Authentication.Me;
 using IncotradeBackend.Application.Authentication.RefreshToken;
 using IncotradeBackend.Infrastructure.Api;
@@ -19,17 +20,20 @@ namespace IncotradeBackend.Presentation.Authentication
         private readonly LoginUseCase _loginUseCase;
         private readonly MeUseCase _meUseCase;
         private readonly RefreshTokenUseCase _refreshTokenUseCase;
+        private readonly LogoutUseCase _logoutUseCase;
 
 
         public AuthenticationController(
             LoginUseCase loginUseCase,
             MeUseCase meUseCase,
-            RefreshTokenUseCase refreshTokenUseCase
+            RefreshTokenUseCase refreshTokenUseCase,
+            LogoutUseCase logoutUseCase
         )
         {
             _loginUseCase = loginUseCase;
             _meUseCase = meUseCase;
             _refreshTokenUseCase = refreshTokenUseCase;
+            _logoutUseCase = logoutUseCase;
         }
 
 
@@ -87,6 +91,21 @@ namespace IncotradeBackend.Presentation.Authentication
             );
         }
 
+        [HttpPost("logout")]
+        public async Task<IActionResult> Logout()
+        {
+            string? refreshToken = Request.Cookies["refreshToken"];
+
+            var command = LogoutMapper.ToCommand(refreshToken);
+            await _logoutUseCase.ExecuteAsync(command);
+
+            DeleteRefreshTokenCookie();
+
+            return Ok(SuccessResponse<object?>
+                .SuccessMessage("Đăng xuất thành công.")
+            );
+        }
+
 
 
         // PRIVATE METHODS
@@ -110,7 +129,15 @@ namespace IncotradeBackend.Presentation.Authentication
 
         private void DeleteRefreshTokenCookie()
         {
-            HttpContext.Response.Cookies.Delete("refreshToken");
+            HttpContext.Response.Cookies.Delete(
+                "refreshToken",
+                new CookieOptions
+                {
+                    Secure = true,
+                    SameSite = SameSiteMode.Lax,
+                    Path = "/api/auth"
+                }
+            );
         }
         
     }
