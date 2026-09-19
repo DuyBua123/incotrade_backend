@@ -13,6 +13,7 @@ namespace IncotradeBackend.Infrastructure.Database
         // Db Set
         public DbSet<User> Users { set; get; }
         public DbSet<LoginSession> LoginSessions { get; set; }
+        public DbSet<Service> Services { get; set; }
 
 
 
