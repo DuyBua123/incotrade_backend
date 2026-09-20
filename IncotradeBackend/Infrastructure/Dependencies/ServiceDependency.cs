@@ -1,4 +1,5 @@
 using FluentValidation;
+using IncotradeBackend.Application.Service.CreateService;
 using IncotradeBackend.Application.Service.GetService;
 using IncotradeBackend.Application.Service.GetServices;
 using IncotradeBackend.Presentation.Service.Request;
@@ -11,8 +12,10 @@ namespace IncotradeBackend.Infrastructure.Dependencies
         public static IServiceCollection AddServiceDependencies(
             this IServiceCollection services)
         {
+            services.AddScoped<IValidator<CreateServiceRequest>, CreateServiceRequestValidator>();
             services.AddScoped<IValidator<GetServicesRequest>, GetServicesRequestValidator>();
             services.AddScoped<IValidator<GetServiceRequest>, GetServiceRequestValidator>();
+            services.AddScoped<CreateServiceUseCase>();
             services.AddScoped<GetServicesUseCase>();
             services.AddScoped<GetServiceUseCase>();
 
