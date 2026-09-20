@@ -1,3 +1,4 @@
+using IncotradeBackend.Application.Service.CreateService;
 using IncotradeBackend.Application.Service.GetService;
 using IncotradeBackend.Application.Service.GetServices;
 using IncotradeBackend.Infrastructure.Api;
@@ -14,15 +15,39 @@ namespace IncotradeBackend.Presentation.Service
     [Route("api/services")]
     public class ServiceController : ControllerBase
     {
+        private readonly CreateServiceUseCase _createServiceUseCase;
         private readonly GetServicesUseCase _getServicesUseCase;
         private readonly GetServiceUseCase _getServiceUseCase;
 
         public ServiceController(
+            CreateServiceUseCase createServiceUseCase,
             GetServicesUseCase getServicesUseCase,
             GetServiceUseCase getServiceUseCase)
         {
+            _createServiceUseCase = createServiceUseCase;
             _getServicesUseCase = getServicesUseCase;
             _getServiceUseCase = getServiceUseCase;
+        }
+
+        [Authorize(Roles = "ADMIN")]
+        [HttpPost("create-service")]
+        public async Task<IActionResult> CreateService(
+            [FromBody] CreateServiceRequest request)
+        {
+            if (!ModelState.IsValid)
+            {
+                throw new InputValidationException(ModelState);
+            }
+
+            var command = CreateServiceMapper.ToCommand(request);
+            var result = await _createServiceUseCase.ExecuteAsync(command);
+
+            var response = CreateServiceMapper.ToResponse(result);
+
+            return Ok(SuccessResponse<CreateServiceResponse>
+                .Success("Tạo dịch vụ thành công.",
+                response)
+            );
         }
 
         [Authorize(Roles = "ADMIN")]
