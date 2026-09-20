@@ -1,6 +1,7 @@
 using IncotradeBackend.Application.Service.CreateService;
 using IncotradeBackend.Application.Service.GetService;
 using IncotradeBackend.Application.Service.GetServices;
+using IncotradeBackend.Application.Service.UpdateService;
 using IncotradeBackend.Infrastructure.Api;
 using IncotradeBackend.Infrastructure.Exceptions;
 using IncotradeBackend.Infrastructure.Mapper.Service;
@@ -18,15 +19,18 @@ namespace IncotradeBackend.Presentation.Service
         private readonly CreateServiceUseCase _createServiceUseCase;
         private readonly GetServicesUseCase _getServicesUseCase;
         private readonly GetServiceUseCase _getServiceUseCase;
+        private readonly UpdateServiceUseCase _updateServiceUseCase;
 
         public ServiceController(
             CreateServiceUseCase createServiceUseCase,
             GetServicesUseCase getServicesUseCase,
-            GetServiceUseCase getServiceUseCase)
+            GetServiceUseCase getServiceUseCase,
+            UpdateServiceUseCase updateServiceUseCase)
         {
             _createServiceUseCase = createServiceUseCase;
             _getServicesUseCase = getServicesUseCase;
             _getServiceUseCase = getServiceUseCase;
+            _updateServiceUseCase = updateServiceUseCase;
         }
 
         [Authorize(Roles = "ADMIN")]
@@ -88,6 +92,27 @@ namespace IncotradeBackend.Presentation.Service
 
             return Ok(SuccessResponse<GetServiceResponse>
                 .Success("Lấy chi tiết dịch vụ thành công.",
+                response)
+            );
+        }
+
+        [Authorize(Roles = "ADMIN")]
+        [HttpPut("update-service")]
+        public async Task<IActionResult> UpdateService(
+            [FromBody] UpdateServiceRequest request)
+        {
+            if (!ModelState.IsValid)
+            {
+                throw new InputValidationException(ModelState);
+            }
+
+            var command = UpdateServiceMapper.ToCommand(request);
+            var result = await _updateServiceUseCase.ExecuteAsync(command);
+
+            var response = UpdateServiceMapper.ToResponse(result);
+
+            return Ok(SuccessResponse<UpdateServiceResponse>
+                .Success("Cập nhật dịch vụ thành công.",
                 response)
             );
         }

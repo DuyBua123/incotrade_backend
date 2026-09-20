@@ -6,7 +6,7 @@ namespace IncotradeBackend.Infrastructure.Exceptions
     {
         public string Error { get; }
 
-        public NotFoundException(string error) : base("Không tìm thấy.")
+        public NotFoundException(string error) : base(error)
         {
             Error = error;
         }
