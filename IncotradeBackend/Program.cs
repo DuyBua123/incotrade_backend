@@ -33,6 +33,7 @@ builder.Services.AddFluentValidationAutoValidation();
 // Register Dependencies
 builder.Services.AddSecurityDependency();
 builder.Services.AddAuthenticationDependencies(builder.Configuration);
+builder.Services.AddServiceDependencies();
 
 // Register Swagger/OpenAPI
 builder.Services.AddOpenApi();
