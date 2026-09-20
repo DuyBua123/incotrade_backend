@@ -1,5 +1,6 @@
 using System.Text;
 using FluentValidation.AspNetCore;
+using IncotradeBackend.Infrastructure.Api;
 using IncotradeBackend.Infrastructure.Database;
 using IncotradeBackend.Infrastructure.Database.Model;
 using IncotradeBackend.Infrastructure.Database.Seed;
@@ -87,22 +88,26 @@ builder.Services
 
                 return Task.CompletedTask;
             },
+            // Handling authentication error:
+            // Missing Access Token in Authorization: Bearer
+            // Access Token expired
+            // Access Token with invalid signature, tempreed, issuer, audience
+            OnChallenge = async context =>
+            {
+                context.HandleResponse();
 
-            // OnChallenge = async context =>
-            // {
-            //     context.HandleResponse();
+                context.Response.StatusCode = StatusCodes.Status401Unauthorized;
 
-            //     var exception = context.HttpContext.Items["AuthException"] as UnauthenticatedException;
+                context.Response.Headers.WWWAuthenticate = "Bearer";
 
-
-            //     context.Response.StatusCode = StatusCodes.Status401Unauthorized;
-            //     context.Response.ContentType = "application/json";
-
-            //     await context.Response.WriteAsJsonAsync(
-            //         FailureResponse<object>.FailureMessage(
-            //             exception!.Message,
-            //             ErrorCodes.UNAUTHENTICATED_ERROR));
-            // },
+                await context.Response.WriteAsJsonAsync(
+                    FailureResponse<object>.Failure(
+                        "Chưa được xác thực.",
+                        ErrorCodes.UNAUTHENTICATED_ERROR,
+                        "Chưa được xác thực."
+                    )
+                );
+            },
 
             // OnForbidden = async context =>
             // {
