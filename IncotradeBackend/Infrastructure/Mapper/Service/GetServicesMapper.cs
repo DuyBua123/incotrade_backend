@@ -12,8 +12,8 @@ namespace IncotradeBackend.Infrastructure.Mapper.Service
         {
             return new GetServicesCommand
             {
-                Page = request.Page,
-                Size = request.Size,
+                Page = int.Parse(request.Page),
+                Size = int.Parse(request.Size),
                 SearchName = request.SearchName
             };
         }
