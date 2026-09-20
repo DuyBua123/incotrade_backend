@@ -1,3 +1,4 @@
+using IncotradeBackend.Application.Service.GetService;
 using IncotradeBackend.Application.Service.GetServices;
 using IncotradeBackend.Infrastructure.Api;
 using IncotradeBackend.Infrastructure.Exceptions;
@@ -14,10 +15,14 @@ namespace IncotradeBackend.Presentation.Service
     public class ServiceController : ControllerBase
     {
         private readonly GetServicesUseCase _getServicesUseCase;
+        private readonly GetServiceUseCase _getServiceUseCase;
 
-        public ServiceController(GetServicesUseCase getServicesUseCase)
+        public ServiceController(
+            GetServicesUseCase getServicesUseCase,
+            GetServiceUseCase getServiceUseCase)
         {
             _getServicesUseCase = getServicesUseCase;
+            _getServiceUseCase = getServiceUseCase;
         }
 
         [Authorize(Roles = "ADMIN")]
@@ -36,7 +41,28 @@ namespace IncotradeBackend.Presentation.Service
             var response = GetServicesMapper.ToResponse(result);
 
             return Ok(SuccessResponse<PageableResponse<GetServicesResponse>>
-                .Success("Get services successfully.",
+                .Success("Lấy danh sách các dịch vụ thành công.",
+                response)
+            );
+        }
+
+        [Authorize(Roles = "ADMIN")]
+        [HttpGet("get-service")]
+        public async Task<IActionResult> GetService(
+            [FromQuery] GetServiceRequest request)
+        {
+            if (!ModelState.IsValid)
+            {
+                throw new InputValidationException(ModelState);
+            }
+
+            var command = GetServiceMapper.ToCommand(request);
+            var result = await _getServiceUseCase.ExecuteAsync(command);
+
+            var response = GetServiceMapper.ToResponse(result);
+
+            return Ok(SuccessResponse<GetServiceResponse>
+                .Success("Lấy chi tiết dịch vụ thành công.",
                 response)
             );
         }
