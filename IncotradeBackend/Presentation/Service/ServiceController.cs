@@ -1,6 +1,7 @@
 using IncotradeBackend.Application.Service.CreateService;
 using IncotradeBackend.Application.Service.GetService;
 using IncotradeBackend.Application.Service.GetServices;
+using IncotradeBackend.Application.Service.SetServiceLocking;
 using IncotradeBackend.Application.Service.UpdateService;
 using IncotradeBackend.Infrastructure.Api;
 using IncotradeBackend.Infrastructure.Exceptions;
@@ -19,17 +20,20 @@ namespace IncotradeBackend.Presentation.Service
         private readonly CreateServiceUseCase _createServiceUseCase;
         private readonly GetServicesUseCase _getServicesUseCase;
         private readonly GetServiceUseCase _getServiceUseCase;
+        private readonly SetServiceLockingUseCase _setServiceLockingUseCase;
         private readonly UpdateServiceUseCase _updateServiceUseCase;
 
         public ServiceController(
             CreateServiceUseCase createServiceUseCase,
             GetServicesUseCase getServicesUseCase,
             GetServiceUseCase getServiceUseCase,
+            SetServiceLockingUseCase setServiceLockingUseCase,
             UpdateServiceUseCase updateServiceUseCase)
         {
             _createServiceUseCase = createServiceUseCase;
             _getServicesUseCase = getServicesUseCase;
             _getServiceUseCase = getServiceUseCase;
+            _setServiceLockingUseCase = setServiceLockingUseCase;
             _updateServiceUseCase = updateServiceUseCase;
         }
 
@@ -113,6 +117,27 @@ namespace IncotradeBackend.Presentation.Service
 
             return Ok(SuccessResponse<UpdateServiceResponse>
                 .Success("Cập nhật dịch vụ thành công.",
+                response)
+            );
+        }
+
+        [Authorize(Roles = "ADMIN")]
+        [HttpPatch("set-service-locking")]
+        public async Task<IActionResult> SetServiceLocking(
+            [FromBody] SetServiceLockingRequest request)
+        {
+            if (!ModelState.IsValid)
+            {
+                throw new InputValidationException(ModelState);
+            }
+
+            var command = SetServiceLockingMapper.ToCommand(request);
+            var result = await _setServiceLockingUseCase.ExecuteAsync(command);
+
+            var response = SetServiceLockingMapper.ToResponse(result);
+
+            return Ok(SuccessResponse<SetServiceLockingResponse>
+                .Success("Cập nhật trạng thái khóa dịch vụ thành công.",
                 response)
             );
         }
