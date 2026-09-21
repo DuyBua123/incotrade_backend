@@ -1,3 +1,4 @@
+using IncotradeBackend.Application.Staff.CreateStaff;
 using IncotradeBackend.Application.Staff.GetStaff;
 using IncotradeBackend.Application.Staff.GetStaffs;
 using IncotradeBackend.Infrastructure.Api;
@@ -14,15 +15,39 @@ namespace IncotradeBackend.Presentation.Staff
     [Route("api/staffs")]
     public class StaffController : ControllerBase
     {
+        private readonly CreateStaffUseCase _createStaffUseCase;
         private readonly GetStaffUseCase _getStaffUseCase;
         private readonly GetStaffsUseCase _getStaffsUseCase;
 
         public StaffController(
+            CreateStaffUseCase createStaffUseCase,
             GetStaffUseCase getStaffUseCase,
             GetStaffsUseCase getStaffsUseCase)
         {
+            _createStaffUseCase = createStaffUseCase;
             _getStaffUseCase = getStaffUseCase;
             _getStaffsUseCase = getStaffsUseCase;
+        }
+
+        [Authorize(Roles = "ADMIN")]
+        [HttpPost("create-staff")]
+        public async Task<IActionResult> CreateStaff(
+            [FromBody] CreateStaffRequest request)
+        {
+            if (!ModelState.IsValid)
+            {
+                throw new InputValidationException(ModelState);
+            }
+
+            var command = CreateStaffMapper.ToCommand(request);
+            var result = await _createStaffUseCase.ExecuteAsync(command);
+
+            var response = CreateStaffMapper.ToResponse(result);
+
+            return Ok(SuccessResponse<CreateStaffResponse>
+                .Success("Tạo nhân viên thành công.",
+                response)
+            );
         }
 
         [Authorize(Roles = "ADMIN")]

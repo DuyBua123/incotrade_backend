@@ -63,6 +63,18 @@ namespace IncotradeBackend.Infrastructure.Exceptions
 
                     return true;
 
+                case DuplicatedException ex:
+                    context.Response.StatusCode = StatusCodes.Status409Conflict;
+
+                    await context.Response.WriteAsJsonAsync(
+                        FailureResponse<string>.Failure(
+                            "Dữ liệu bì trùng lập.",
+                            ErrorCodes.DUPLICATED_ERROR,
+                            ex.Error
+                        ), cancellationToken);
+
+                    return true;
+
                 default:
                     return false;
             }

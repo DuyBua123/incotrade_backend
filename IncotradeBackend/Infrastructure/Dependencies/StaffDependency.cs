@@ -1,4 +1,5 @@
 using FluentValidation;
+using IncotradeBackend.Application.Staff.CreateStaff;
 using IncotradeBackend.Application.Staff.GetStaff;
 using IncotradeBackend.Application.Staff.GetStaffs;
 using IncotradeBackend.Presentation.Staff.Request;
@@ -11,8 +12,10 @@ namespace IncotradeBackend.Infrastructure.Dependencies
         public static IServiceCollection AddStaffDependencies(
             this IServiceCollection services)
         {
+            services.AddScoped<IValidator<CreateStaffRequest>, CreateStaffRequestValidator>();
             services.AddScoped<IValidator<GetStaffRequest>, GetStaffRequestValidator>();
             services.AddScoped<IValidator<GetStaffsRequest>, GetStaffsRequestValidator>();
+            services.AddScoped<CreateStaffUseCase>();
             services.AddScoped<GetStaffUseCase>();
             services.AddScoped<GetStaffsUseCase>();
 
