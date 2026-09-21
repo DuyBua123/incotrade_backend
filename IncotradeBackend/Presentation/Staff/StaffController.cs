@@ -1,5 +1,6 @@
-using IncotradeBackend.Application.Staff.CreateStaff;
+﻿using IncotradeBackend.Application.Staff.CreateStaff;
 using IncotradeBackend.Application.Staff.GetStaff;
+using IncotradeBackend.Application.Staff.GetStaffSchedules;
 using IncotradeBackend.Application.Staff.GetStaffs;
 using IncotradeBackend.Application.Staff.UpdateStaff;
 using IncotradeBackend.Infrastructure.Api;
@@ -18,17 +19,20 @@ namespace IncotradeBackend.Presentation.Staff
     {
         private readonly CreateStaffUseCase _createStaffUseCase;
         private readonly GetStaffUseCase _getStaffUseCase;
+        private readonly GetStaffSchedulesUseCase _getStaffSchedulesUseCase;
         private readonly GetStaffsUseCase _getStaffsUseCase;
         private readonly UpdateStaffUseCase _updateStaffUseCase;
 
         public StaffController(
             CreateStaffUseCase createStaffUseCase,
             GetStaffUseCase getStaffUseCase,
+            GetStaffSchedulesUseCase getStaffSchedulesUseCase,
             GetStaffsUseCase getStaffsUseCase,
             UpdateStaffUseCase updateStaffUseCase)
         {
             _createStaffUseCase = createStaffUseCase;
             _getStaffUseCase = getStaffUseCase;
+            _getStaffSchedulesUseCase = getStaffSchedulesUseCase;
             _getStaffsUseCase = getStaffsUseCase;
             _updateStaffUseCase = updateStaffUseCase;
         }
@@ -92,6 +96,27 @@ namespace IncotradeBackend.Presentation.Staff
 
             return Ok(SuccessResponse<GetStaffResponse>
                 .Success("Lấy chi tiết nhân viên thành công.",
+                response)
+            );
+        }
+
+        [Authorize(Roles = "ADMIN")]
+        [HttpGet("get-staff-schedules")]
+        public async Task<IActionResult> GetStaffSchedules(
+            [FromQuery] GetStaffSchedulesRequest request)
+        {
+            if (!ModelState.IsValid)
+            {
+                throw new InputValidationException(ModelState);
+            }
+
+            var command = GetStaffSchedulesMapper.ToCommand(request);
+            var result = await _getStaffSchedulesUseCase.ExecuteAsync(command);
+
+            var response = GetStaffSchedulesMapper.ToResponse(result);
+
+            return Ok(SuccessResponse<PageableResponse<GetStaffSchedulesResponse>>
+                .Success("Lấy lịch làm việc của nhân viên thành công.",
                 response)
             );
         }
