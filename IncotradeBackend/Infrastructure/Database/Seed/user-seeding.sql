@@ -12,3 +12,4 @@ VALUES (
     'ADMIN',
     NOW()
 );
+

@@ -24,7 +24,7 @@ namespace IncotradeBackend.Infrastructure.Mapper.Service
             return new GetServicesResult
             {
                 Id = service.Id,
-                Name = service.Name,
+                ServiceName = service.Name,
                 Description = service.Description,
                 DurationMinutes = service.DurationMinutes,
                 Price = service.Price,
@@ -43,7 +43,7 @@ namespace IncotradeBackend.Infrastructure.Mapper.Service
                     .Select(service => new GetServicesResponse
                     {
                         Id = service.Id,
-                        Name = service.Name,
+                        ServiceName = service.ServiceName,
                         Description = service.Description,
                         DurationMinutes = service.DurationMinutes,
                         Price = service.Price,

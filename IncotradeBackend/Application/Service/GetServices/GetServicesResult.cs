@@ -3,7 +3,7 @@ namespace IncotradeBackend.Application.Service.GetServices
     public record GetServicesResult
     {
         public int Id { get; init; }
-        public string Name { get; init; } = string.Empty;
+        public string ServiceName { get; init; } = string.Empty;
         public string? Description { get; init; }
         public int DurationMinutes { get; init; }
         public long Price { get; init; }

@@ -27,6 +27,7 @@ namespace IncotradeBackend.Application.Authentication.Me
         {
             if (string.IsNullOrWhiteSpace(command.RefreshToken))
             {
+                Console.Write("Refresh token trống");
                 throw new InvalidRefreshTokenException("Refresh token không hợp lệ.");
             }
 
@@ -38,16 +39,20 @@ namespace IncotradeBackend.Application.Authentication.Me
 
             if (currentLoginSession == null || currentLoginSession.User == null)
             {
+                Console.Write("Login session rỗng");
                 throw new InvalidRefreshTokenException("Refresh token không hợp lệ.");
             }
 
             if (currentLoginSession.RevokedAt != null || currentLoginSession.RevokedReason != null)
             {
+                Console.Write("Login session đã revoked");
                 throw new InvalidRefreshTokenException("Refresh token không hợp lệ.");
             }
 
             if (IsExpired(currentLoginSession))
             {
+                Console.Write("Login session expired");
+
                 currentLoginSession.RevokedAt = DateTimeOffset.UtcNow;
                 currentLoginSession.RevokedReason = RevokedReason.SESSION_EXPIRED;
 
@@ -60,6 +65,9 @@ namespace IncotradeBackend.Application.Authentication.Me
             string accessToken = _jwtService.GenerateAccessToken(
                 currentLoginSession.User,
                 currentLoginSession.AccessExpiresAt);
+
+                            Console.WriteLine(accessToken);
+
 
             return MeMapper.ToResult(accessToken, currentLoginSession.User);
         }

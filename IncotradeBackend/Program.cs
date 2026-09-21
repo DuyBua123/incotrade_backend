@@ -101,7 +101,7 @@ builder.Services
                 context.Response.Headers.WWWAuthenticate = "Bearer";
 
                 await context.Response.WriteAsJsonAsync(
-                    FailureResponse<object>.Failure(
+                    FailureResponse<string>.Failure(
                         "Chưa được xác thực.",
                         ErrorCodes.UNAUTHENTICATED_ERROR,
                         "Chưa được xác thực."

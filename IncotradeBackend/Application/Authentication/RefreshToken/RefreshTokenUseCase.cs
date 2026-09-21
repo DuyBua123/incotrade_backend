@@ -58,7 +58,7 @@ namespace IncotradeBackend.Application.Authentication.RefreshToken
 
             string accessToken = _jwtService.GenerateAccessToken(
                 currentLoginSession.User,
-                currentLoginSession.AccessExpiresAt);
+                _jwtService.GenerateAccessTokenExpiresAt());
 
             return RefreshTokenMapper.ToResult(accessToken);
         }
