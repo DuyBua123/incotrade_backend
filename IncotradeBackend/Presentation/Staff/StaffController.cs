@@ -5,6 +5,7 @@ using IncotradeBackend.Application.Staff.GetStaffSchedule;
 using IncotradeBackend.Application.Staff.GetStaffSchedules;
 using IncotradeBackend.Application.Staff.GetStaffs;
 using IncotradeBackend.Application.Staff.UpdateStaff;
+using IncotradeBackend.Application.Staff.UpdateStaffSchedule;
 using IncotradeBackend.Infrastructure.Api;
 using IncotradeBackend.Infrastructure.Exceptions;
 using IncotradeBackend.Infrastructure.Mapper.Staff;
@@ -26,6 +27,7 @@ namespace IncotradeBackend.Presentation.Staff
         private readonly GetStaffSchedulesUseCase _getStaffSchedulesUseCase;
         private readonly GetStaffsUseCase _getStaffsUseCase;
         private readonly UpdateStaffUseCase _updateStaffUseCase;
+        private readonly UpdateStaffScheduleUseCase _updateStaffScheduleUseCase;
 
         public StaffController(
             CreateStaffUseCase createStaffUseCase,
@@ -34,7 +36,8 @@ namespace IncotradeBackend.Presentation.Staff
             GetStaffScheduleUseCase getStaffScheduleUseCase,
             GetStaffSchedulesUseCase getStaffSchedulesUseCase,
             GetStaffsUseCase getStaffsUseCase,
-            UpdateStaffUseCase updateStaffUseCase)
+            UpdateStaffUseCase updateStaffUseCase,
+            UpdateStaffScheduleUseCase updateStaffScheduleUseCase)
         {
             _createStaffUseCase = createStaffUseCase;
             _createStaffScheduleUseCase = createStaffScheduleUseCase;
@@ -43,6 +46,7 @@ namespace IncotradeBackend.Presentation.Staff
             _getStaffSchedulesUseCase = getStaffSchedulesUseCase;
             _getStaffsUseCase = getStaffsUseCase;
             _updateStaffUseCase = updateStaffUseCase;
+            _updateStaffScheduleUseCase = updateStaffScheduleUseCase;
         }
 
         [Authorize(Roles = "ADMIN")]
@@ -188,6 +192,27 @@ namespace IncotradeBackend.Presentation.Staff
 
             return Ok(SuccessResponse<UpdateStaffResponse>
                 .Success("Cập nhật nhân viên thành công.",
+                response)
+            );
+        }
+
+        [Authorize(Roles = "ADMIN")]
+        [HttpPut("update-staff-schedule")]
+        public async Task<IActionResult> UpdateStaffSchedule(
+            [FromBody] UpdateStaffScheduleRequest request)
+        {
+            if (!ModelState.IsValid)
+            {
+                throw new InputValidationException(ModelState);
+            }
+
+            var command = UpdateStaffScheduleMapper.ToCommand(request);
+            var result = await _updateStaffScheduleUseCase.ExecuteAsync(command);
+
+            var response = UpdateStaffScheduleMapper.ToResponse(result);
+
+            return Ok(SuccessResponse<UpdateStaffScheduleResponse>
+                .Success("Cập nhật lịch làm việc của nhân viên thành công.",
                 response)
             );
         }
