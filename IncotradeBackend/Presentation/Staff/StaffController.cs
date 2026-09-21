@@ -1,6 +1,7 @@
 using IncotradeBackend.Application.Staff.CreateStaff;
 using IncotradeBackend.Application.Staff.GetStaff;
 using IncotradeBackend.Application.Staff.GetStaffs;
+using IncotradeBackend.Application.Staff.UpdateStaff;
 using IncotradeBackend.Infrastructure.Api;
 using IncotradeBackend.Infrastructure.Exceptions;
 using IncotradeBackend.Infrastructure.Mapper.Staff;
@@ -18,15 +19,18 @@ namespace IncotradeBackend.Presentation.Staff
         private readonly CreateStaffUseCase _createStaffUseCase;
         private readonly GetStaffUseCase _getStaffUseCase;
         private readonly GetStaffsUseCase _getStaffsUseCase;
+        private readonly UpdateStaffUseCase _updateStaffUseCase;
 
         public StaffController(
             CreateStaffUseCase createStaffUseCase,
             GetStaffUseCase getStaffUseCase,
-            GetStaffsUseCase getStaffsUseCase)
+            GetStaffsUseCase getStaffsUseCase,
+            UpdateStaffUseCase updateStaffUseCase)
         {
             _createStaffUseCase = createStaffUseCase;
             _getStaffUseCase = getStaffUseCase;
             _getStaffsUseCase = getStaffsUseCase;
+            _updateStaffUseCase = updateStaffUseCase;
         }
 
         [Authorize(Roles = "ADMIN")]
@@ -88,6 +92,27 @@ namespace IncotradeBackend.Presentation.Staff
 
             return Ok(SuccessResponse<GetStaffResponse>
                 .Success("Lấy chi tiết nhân viên thành công.",
+                response)
+            );
+        }
+
+        [Authorize(Roles = "ADMIN")]
+        [HttpPut("update-staff")]
+        public async Task<IActionResult> UpdateStaff(
+            [FromBody] UpdateStaffRequest request)
+        {
+            if (!ModelState.IsValid)
+            {
+                throw new InputValidationException(ModelState);
+            }
+
+            var command = UpdateStaffMapper.ToCommand(request);
+            var result = await _updateStaffUseCase.ExecuteAsync(command);
+
+            var response = UpdateStaffMapper.ToResponse(result);
+
+            return Ok(SuccessResponse<UpdateStaffResponse>
+                .Success("Cập nhật nhân viên thành công.",
                 response)
             );
         }
