@@ -1,4 +1,5 @@
 ﻿using IncotradeBackend.Application.Staff.CreateStaff;
+using IncotradeBackend.Application.Staff.CreateStaffSchedule;
 using IncotradeBackend.Application.Staff.GetStaff;
 using IncotradeBackend.Application.Staff.GetStaffSchedule;
 using IncotradeBackend.Application.Staff.GetStaffSchedules;
@@ -19,6 +20,7 @@ namespace IncotradeBackend.Presentation.Staff
     public class StaffController : ControllerBase
     {
         private readonly CreateStaffUseCase _createStaffUseCase;
+        private readonly CreateStaffScheduleUseCase _createStaffScheduleUseCase;
         private readonly GetStaffUseCase _getStaffUseCase;
         private readonly GetStaffScheduleUseCase _getStaffScheduleUseCase;
         private readonly GetStaffSchedulesUseCase _getStaffSchedulesUseCase;
@@ -27,6 +29,7 @@ namespace IncotradeBackend.Presentation.Staff
 
         public StaffController(
             CreateStaffUseCase createStaffUseCase,
+            CreateStaffScheduleUseCase createStaffScheduleUseCase,
             GetStaffUseCase getStaffUseCase,
             GetStaffScheduleUseCase getStaffScheduleUseCase,
             GetStaffSchedulesUseCase getStaffSchedulesUseCase,
@@ -34,6 +37,7 @@ namespace IncotradeBackend.Presentation.Staff
             UpdateStaffUseCase updateStaffUseCase)
         {
             _createStaffUseCase = createStaffUseCase;
+            _createStaffScheduleUseCase = createStaffScheduleUseCase;
             _getStaffUseCase = getStaffUseCase;
             _getStaffScheduleUseCase = getStaffScheduleUseCase;
             _getStaffSchedulesUseCase = getStaffSchedulesUseCase;
@@ -58,6 +62,27 @@ namespace IncotradeBackend.Presentation.Staff
 
             return Ok(SuccessResponse<CreateStaffResponse>
                 .Success("Tạo nhân viên thành công.",
+                response)
+            );
+        }
+
+        [Authorize(Roles = "ADMIN")]
+        [HttpPost("create-staff-schedule")]
+        public async Task<IActionResult> CreateStaffSchedule(
+            [FromBody] CreateStaffScheduleRequest request)
+        {
+            if (!ModelState.IsValid)
+            {
+                throw new InputValidationException(ModelState);
+            }
+
+            var command = CreateStaffScheduleMapper.ToCommand(request);
+            var result = await _createStaffScheduleUseCase.ExecuteAsync(command);
+
+            var response = CreateStaffScheduleMapper.ToResponse(result);
+
+            return Ok(SuccessResponse<CreateStaffScheduleResponse>
+                .Success("Tạo lịch làm việc của nhân viên thành công.",
                 response)
             );
         }
