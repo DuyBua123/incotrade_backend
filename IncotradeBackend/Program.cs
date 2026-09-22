@@ -36,6 +36,7 @@ builder.Services.AddSecurityDependency();
 builder.Services.AddAuthenticationDependencies(builder.Configuration);
 builder.Services.AddServiceDependencies();
 builder.Services.AddStaffDependencies();
+builder.Services.AddBookingDependencies();
 
 // Register Swagger/OpenAPI
 builder.Services.AddOpenApi();

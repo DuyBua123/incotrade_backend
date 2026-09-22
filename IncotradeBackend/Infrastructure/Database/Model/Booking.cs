@@ -24,6 +24,9 @@ namespace IncotradeBackend.Infrastructure.Database.Model
         public int StaffId { get; set; }
 
         [Required]
+        public DateOnly ServedDate { get; set; }
+
+        [Required]
         public TimeOnly StartTime { get; set; }
 
         [Required]
