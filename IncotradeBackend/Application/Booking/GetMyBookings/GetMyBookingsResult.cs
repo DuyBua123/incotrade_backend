@@ -7,8 +7,8 @@ namespace IncotradeBackend.Application.Booking.GetMyBookings
         public int Id { get; init; }
         public string BookingCode { get; init; } = string.Empty;
         public int CustomerId { get; init; }
-        public int ServiceId { get; init; }
-        public int StaffId { get; init; }
+        public string ServiceName { get; init; } = string.Empty;
+        public string StaffFullName { get; init; } = string.Empty;
         public DateOnly ServedDate { get; init; }
         public TimeOnly StartTime { get; init; }
         public TimeOnly EndTime { get; init; }

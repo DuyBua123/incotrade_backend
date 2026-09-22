@@ -19,6 +19,8 @@ namespace IncotradeBackend.Application.Booking.GetMyBookings
         {
             var query = _context.Bookings
                 .AsNoTracking()
+                .Include(b => b.Service)
+                .Include(s => s.Staff)
                 .Where(booking => booking.CustomerId == command.CustomerId);
 
             if (command.ServedDate.HasValue)
