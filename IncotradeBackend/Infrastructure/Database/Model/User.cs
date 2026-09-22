@@ -31,6 +31,7 @@ namespace IncotradeBackend.Infrastructure.Database.Model
 
         // Relationship
         public ICollection<LoginSession> LoginSessions { get; set; } = [];
+        public ICollection<Booking> Bookings { get; set; } = [];
 
     }
 }

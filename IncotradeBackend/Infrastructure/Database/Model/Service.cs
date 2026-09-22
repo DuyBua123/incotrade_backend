@@ -29,5 +29,9 @@ namespace IncotradeBackend.Infrastructure.Database.Model
         public DateTimeOffset CreatedAt { get; set; } = DateTimeOffset.UtcNow;
 
         public DateTimeOffset UpdatedAt { get; set; } = DateTimeOffset.UtcNow;
+
+
+        // Relationships
+        public ICollection<Booking> Bookings { get; set; } = [];
     }
 }

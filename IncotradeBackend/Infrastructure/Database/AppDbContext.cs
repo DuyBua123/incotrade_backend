@@ -1,5 +1,6 @@
 
 using IncotradeBackend.Infrastructure.Database.Model;
+using IncotradeBackend.Infrastructure.Database.Enum;
 using Microsoft.EntityFrameworkCore;
 
 namespace IncotradeBackend.Infrastructure.Database
@@ -16,6 +17,7 @@ namespace IncotradeBackend.Infrastructure.Database
         public DbSet<Service> Services { get; set; }
         public DbSet<Staff> Staffs { get; set; }
         public DbSet<WorkSchedule> WorkSchedules { get; set; }
+        public DbSet<Booking> Bookings { get; set; }
 
 
 
@@ -42,6 +44,16 @@ namespace IncotradeBackend.Infrastructure.Database
             modelBuilder.Entity<Staff>()
                 .Property(s => s.IsLocked)
                 .HasDefaultValue(true);
+
+            // Configure Booking table
+            modelBuilder.Entity<Booking>()
+                .HasIndex(b => b.BookingCode)
+                .IsUnique();
+
+            modelBuilder.Entity<Booking>()
+                .Property(b => b.Status)
+                .HasConversion<string>()
+                .HasDefaultValue(BookingStatus.PENDING);
 
         }
         

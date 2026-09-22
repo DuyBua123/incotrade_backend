@@ -24,6 +24,9 @@ namespace IncotradeBackend.Infrastructure.Database.Model
         [Required]
         public DateTimeOffset UpdatedAt { get; set; } = DateTimeOffset.UtcNow;
 
+
+        // Relationships
         public ICollection<WorkSchedule> WorkSchedules { get; set; } = [];
+        public ICollection<Booking> Bookings { get; set; } = [];
     }
 }
