@@ -29,7 +29,7 @@ namespace IncotradeBackend.Application.Booking.CreateBooking
 
             if (service.IsLocked)
             {
-                throw new DuplicatedException("Dịch vụ đang bị khóa.");
+                throw new ResourceLockedException("Dịch vụ đang bị khóa.");
             }
 
             var staffSchedule = await _context.WorkSchedules
@@ -44,23 +44,22 @@ namespace IncotradeBackend.Application.Booking.CreateBooking
 
             if (staffSchedule.Staff.IsLocked)
             {
-                throw new DuplicatedException("Nhân viên đang bị khóa.");
+                throw new ResourceLockedException("Nhân viên đang bị khóa.");
             }
 
             var today = DateOnly.FromDateTime(DateTime.Now);
 
             if (staffSchedule.WorkDate <= today)
             {
-                throw new DuplicatedException("Ngày phục vụ phải là ngày trong tương lai.");
+                throw new InvalidDateException("Ngày phục vụ phải là ngày trong tương lai.");
             }
 
             var endTime = command.StartTime.AddMinutes(service.DurationMinutes);
 
-
             if (command.StartTime < staffSchedule.StartTime
                 || endTime > staffSchedule.EndTime)
             {
-                throw new DuplicatedException("Thời gian đặt lịch không nằm trong lịch làm việc của nhân viên.");
+                throw new InvalidDateException("Thời gian đặt lịch không nằm trong lịch làm việc của nhân viên.");
             }
 
             bool isBookingOverlapped = await _context.Bookings

@@ -75,6 +75,30 @@ namespace IncotradeBackend.Infrastructure.Exceptions
 
                     return true;
 
+                case ResourceLockedException ex:
+                    context.Response.StatusCode = StatusCodes.Status423Locked;
+
+                    await context.Response.WriteAsJsonAsync(
+                        FailureResponse<string>.Failure(
+                            "Tài nguyên đang bị khóa.",
+                            ErrorCodes.RESOURCE_LOCKED_ERROR,
+                            ex.Error
+                        ), cancellationToken);
+
+                    return true;
+
+                case InvalidDateException ex:
+                    context.Response.StatusCode = StatusCodes.Status400BadRequest;
+
+                    await context.Response.WriteAsJsonAsync(
+                        FailureResponse<string>.Failure(
+                            "Ngày hoặc thời gian không hợp lệ.",
+                            ErrorCodes.INVALID_DATE_ERROR,
+                            ex.Error
+                        ), cancellationToken);
+
+                    return true;
+
                 default:
                     return false;
             }
