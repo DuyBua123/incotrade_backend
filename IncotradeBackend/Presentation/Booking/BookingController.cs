@@ -1,6 +1,7 @@
 using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
 using IncotradeBackend.Application.Booking.CreateBooking;
+using IncotradeBackend.Application.Booking.GetMyBookings;
 using IncotradeBackend.Infrastructure.Api;
 using IncotradeBackend.Infrastructure.Exceptions;
 using IncotradeBackend.Infrastructure.Mapper.Booking;
@@ -16,10 +17,14 @@ namespace IncotradeBackend.Presentation.Booking
     public class BookingController : ControllerBase
     {
         private readonly CreateBookingUseCase _createBookingUseCase;
+        private readonly GetMyBookingsUseCase _getMyBookingsUseCase;
 
-        public BookingController(CreateBookingUseCase createBookingUseCase)
+        public BookingController(
+            CreateBookingUseCase createBookingUseCase,
+            GetMyBookingsUseCase getMyBookingsUseCase)
         {
             _createBookingUseCase = createBookingUseCase;
+            _getMyBookingsUseCase = getMyBookingsUseCase;
         }
 
         [Authorize(Roles = "CUSTOMER")]
@@ -40,6 +45,28 @@ namespace IncotradeBackend.Presentation.Booking
 
             return Ok(SuccessResponse<CreateBookingResponse>
                 .Success("Tạo lịch hẹn thành công.",
+                response)
+            );
+        }
+
+        [Authorize(Roles = "CUSTOMER")]
+        [HttpGet("get-my-bookings")]
+        public async Task<IActionResult> GetMyBookings(
+            [FromQuery] GetMyBookingsRequest request)
+        {
+            if (!ModelState.IsValid)
+            {
+                throw new InputValidationException(ModelState);
+            }
+
+            int customerId = GetCurrentCustomerId();
+            var command = GetMyBookingsMapper.ToCommand(request, customerId);
+            var result = await _getMyBookingsUseCase.ExecuteAsync(command);
+
+            var response = GetMyBookingsMapper.ToResponse(result);
+
+            return Ok(SuccessResponse<PageableResponse<GetMyBookingsResponse>>
+                .Success("Lấy danh sách lịch hẹn của tôi thành công.",
                 response)
             );
         }

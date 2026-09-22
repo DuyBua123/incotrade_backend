@@ -89,6 +89,8 @@ namespace IncotradeBackend.Application.Booking.CreateBooking
             return CreateBookingMapper.ToResult(booking);
         }
 
+
+        // PRIVATE METHODS
         private static string GenerateBookingCode()
         {
             return $"BK{DateTimeOffset.UtcNow:yyyyMMddHHmmssfff}{Guid.NewGuid():N}"[..30];
