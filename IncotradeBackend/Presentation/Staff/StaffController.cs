@@ -1,5 +1,6 @@
-﻿using IncotradeBackend.Application.Staff.CreateStaff;
+using IncotradeBackend.Application.Staff.CreateStaff;
 using IncotradeBackend.Application.Staff.CreateStaffSchedule;
+using IncotradeBackend.Application.Staff.GetAvailableStaffs;
 using IncotradeBackend.Application.Staff.GetStaff;
 using IncotradeBackend.Application.Staff.GetStaffSchedule;
 using IncotradeBackend.Application.Staff.GetStaffSchedules;
@@ -22,6 +23,7 @@ namespace IncotradeBackend.Presentation.Staff
     {
         private readonly CreateStaffUseCase _createStaffUseCase;
         private readonly CreateStaffScheduleUseCase _createStaffScheduleUseCase;
+        private readonly GetAvailableStaffsUseCase _getAvailableStaffsUseCase;
         private readonly GetStaffUseCase _getStaffUseCase;
         private readonly GetStaffScheduleUseCase _getStaffScheduleUseCase;
         private readonly GetStaffSchedulesUseCase _getStaffSchedulesUseCase;
@@ -32,6 +34,7 @@ namespace IncotradeBackend.Presentation.Staff
         public StaffController(
             CreateStaffUseCase createStaffUseCase,
             CreateStaffScheduleUseCase createStaffScheduleUseCase,
+            GetAvailableStaffsUseCase getAvailableStaffsUseCase,
             GetStaffUseCase getStaffUseCase,
             GetStaffScheduleUseCase getStaffScheduleUseCase,
             GetStaffSchedulesUseCase getStaffSchedulesUseCase,
@@ -41,6 +44,7 @@ namespace IncotradeBackend.Presentation.Staff
         {
             _createStaffUseCase = createStaffUseCase;
             _createStaffScheduleUseCase = createStaffScheduleUseCase;
+            _getAvailableStaffsUseCase = getAvailableStaffsUseCase;
             _getStaffUseCase = getStaffUseCase;
             _getStaffScheduleUseCase = getStaffScheduleUseCase;
             _getStaffSchedulesUseCase = getStaffSchedulesUseCase;
@@ -108,6 +112,26 @@ namespace IncotradeBackend.Presentation.Staff
 
             return Ok(SuccessResponse<PageableResponse<GetStaffsResponse>>
                 .Success("Lấy danh sách nhân viên thành công.",
+                response)
+            );
+        }
+
+        [HttpGet("get-available-staffs")]
+        public async Task<IActionResult> GetAvailableStaffs(
+            [FromQuery] GetAvailableStaffsRequest request)
+        {
+            if (!ModelState.IsValid)
+            {
+                throw new InputValidationException(ModelState);
+            }
+
+            var command = GetAvailableStaffsMapper.ToCommand(request);
+            var result = await _getAvailableStaffsUseCase.ExecuteAsync(command);
+
+            var response = GetAvailableStaffsMapper.ToResponse(result);
+
+            return Ok(SuccessResponse<PageableResponse<GetAvailableStaffsResponse>>
+                .Success("Lấy danh sách nhân viên khả dụng thành công.",
                 response)
             );
         }

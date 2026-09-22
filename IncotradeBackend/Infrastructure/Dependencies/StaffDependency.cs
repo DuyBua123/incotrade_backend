@@ -1,6 +1,7 @@
 using FluentValidation;
 using IncotradeBackend.Application.Staff.CreateStaff;
 using IncotradeBackend.Application.Staff.CreateStaffSchedule;
+using IncotradeBackend.Application.Staff.GetAvailableStaffs;
 using IncotradeBackend.Application.Staff.GetStaff;
 using IncotradeBackend.Application.Staff.GetStaffSchedule;
 using IncotradeBackend.Application.Staff.GetStaffSchedules;
@@ -23,10 +24,12 @@ namespace IncotradeBackend.Infrastructure.Dependencies
             services.AddScoped<IValidator<GetStaffScheduleRequest>, GetStaffScheduleRequestValidator>();
             services.AddScoped<IValidator<GetStaffSchedulesRequest>, GetStaffSchedulesRequestValidator>();
             services.AddScoped<IValidator<GetStaffsRequest>, GetStaffsRequestValidator>();
+            services.AddScoped<IValidator<GetAvailableStaffsRequest>, GetAvailableStaffsRequestValidator>();
             services.AddScoped<IValidator<UpdateStaffRequest>, UpdateStaffRequestValidator>();
             services.AddScoped<IValidator<UpdateStaffScheduleRequest>, UpdateStaffScheduleRequestValidator>();
             services.AddScoped<CreateStaffUseCase>();
             services.AddScoped<CreateStaffScheduleUseCase>();
+            services.AddScoped<GetAvailableStaffsUseCase>();
             services.AddScoped<GetStaffUseCase>();
             services.AddScoped<GetStaffScheduleUseCase>();
             services.AddScoped<GetStaffSchedulesUseCase>();
