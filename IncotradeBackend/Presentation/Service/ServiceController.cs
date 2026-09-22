@@ -1,4 +1,5 @@
 using IncotradeBackend.Application.Service.CreateService;
+using IncotradeBackend.Application.Service.GetAvailableServices;
 using IncotradeBackend.Application.Service.GetService;
 using IncotradeBackend.Application.Service.GetServices;
 using IncotradeBackend.Application.Service.SetServiceLocking;
@@ -18,6 +19,7 @@ namespace IncotradeBackend.Presentation.Service
     public class ServiceController : ControllerBase
     {
         private readonly CreateServiceUseCase _createServiceUseCase;
+        private readonly GetAvailableServicesUseCase _getAvailableServicesUseCase;
         private readonly GetServicesUseCase _getServicesUseCase;
         private readonly GetServiceUseCase _getServiceUseCase;
         private readonly SetServiceLockingUseCase _setServiceLockingUseCase;
@@ -25,12 +27,14 @@ namespace IncotradeBackend.Presentation.Service
 
         public ServiceController(
             CreateServiceUseCase createServiceUseCase,
+            GetAvailableServicesUseCase getAvailableServicesUseCase,
             GetServicesUseCase getServicesUseCase,
             GetServiceUseCase getServiceUseCase,
             SetServiceLockingUseCase setServiceLockingUseCase,
             UpdateServiceUseCase updateServiceUseCase)
         {
             _createServiceUseCase = createServiceUseCase;
+            _getAvailableServicesUseCase = getAvailableServicesUseCase;
             _getServicesUseCase = getServicesUseCase;
             _getServiceUseCase = getServiceUseCase;
             _setServiceLockingUseCase = setServiceLockingUseCase;
@@ -54,6 +58,26 @@ namespace IncotradeBackend.Presentation.Service
 
             return Ok(SuccessResponse<CreateServiceResponse>
                 .Success("Tạo dịch vụ thành công.",
+                response)
+            );
+        }
+
+        [HttpGet("get-available-services")]
+        public async Task<IActionResult> GetAvailableServices(
+            [FromQuery] GetAvailableServicesRequest request)
+        {
+            if (!ModelState.IsValid)
+            {
+                throw new InputValidationException(ModelState);
+            }
+
+            var command = GetAvailableServicesMapper.ToCommand(request);
+            var result = await _getAvailableServicesUseCase.ExecuteAsync(command);
+
+            var response = GetAvailableServicesMapper.ToResponse(result);
+
+            return Ok(SuccessResponse<PageableResponse<GetAvailableServicesResponse>>
+                .Success("Lấy danh sách dịch vụ khả dụng thành công.",
                 response)
             );
         }

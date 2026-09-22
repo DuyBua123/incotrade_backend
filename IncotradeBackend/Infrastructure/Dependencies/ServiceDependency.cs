@@ -1,5 +1,6 @@
 using FluentValidation;
 using IncotradeBackend.Application.Service.CreateService;
+using IncotradeBackend.Application.Service.GetAvailableServices;
 using IncotradeBackend.Application.Service.GetService;
 using IncotradeBackend.Application.Service.GetServices;
 using IncotradeBackend.Application.Service.SetServiceLocking;
@@ -15,11 +16,13 @@ namespace IncotradeBackend.Infrastructure.Dependencies
             this IServiceCollection services)
         {
             services.AddScoped<IValidator<CreateServiceRequest>, CreateServiceRequestValidator>();
+            services.AddScoped<IValidator<GetAvailableServicesRequest>, GetAvailableServicesRequestValidator>();
             services.AddScoped<IValidator<GetServicesRequest>, GetServicesRequestValidator>();
             services.AddScoped<IValidator<GetServiceRequest>, GetServiceRequestValidator>();
             services.AddScoped<IValidator<UpdateServiceRequest>, UpdateServiceRequestValidator>();
             services.AddScoped<IValidator<SetServiceLockingRequest>, SetServiceLockingRequestValidator>();
             services.AddScoped<CreateServiceUseCase>();
+            services.AddScoped<GetAvailableServicesUseCase>();
             services.AddScoped<GetServicesUseCase>();
             services.AddScoped<GetServiceUseCase>();
             services.AddScoped<SetServiceLockingUseCase>();
