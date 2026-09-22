@@ -16,7 +16,8 @@ namespace IncotradeBackend.Presentation.Staff.Validator
             RuleFor(x => x.WorkDate)
                 .Cascade(CascadeMode.Stop)
                 .NotEmpty().WithMessage("Ngày làm việc không được để trống.")
-                .Must(BeDateOnly).WithMessage("Ngày làm việc không hợp lệ.");
+                .Must(BeDateOnly).WithMessage("Ngày làm việc không hợp lệ.")
+                .Must(NotBePastDate).WithMessage("Ngày làm việc không được ở quá khứ.");
 
             RuleFor(x => x.StartTime)
                 .Cascade(CascadeMode.Stop)
@@ -41,6 +42,12 @@ namespace IncotradeBackend.Presentation.Staff.Validator
         private static bool BeDateOnly(string value)
         {
             return DateOnly.TryParse(value, out _);
+        }
+
+        private static bool NotBePastDate(string value)
+        {
+            return DateOnly.TryParse(value, out DateOnly date)
+                && date >= DateOnly.FromDateTime(DateTime.Today);
         }
 
         private static bool BeTimeOnly(string value)
