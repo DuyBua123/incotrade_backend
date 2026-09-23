@@ -1,5 +1,6 @@
 using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
+using IncotradeBackend.Application.Booking.CancelBooking;
 using IncotradeBackend.Application.Booking.CompleteBooking;
 using IncotradeBackend.Application.Booking.ConfirmBooking;
 using IncotradeBackend.Application.Booking.CreateBooking;
@@ -19,6 +20,7 @@ namespace IncotradeBackend.Presentation.Booking
     [Route("api/bookings")]
     public class BookingController : ControllerBase
     {
+        private readonly CancelBookingUseCase _cancelBookingUseCase;
         private readonly CompleteBookingUseCase _completeBookingUseCase;
         private readonly ConfirmBookingUseCase _confirmBookingUseCase;
         private readonly CreateBookingUseCase _createBookingUseCase;
@@ -26,12 +28,14 @@ namespace IncotradeBackend.Presentation.Booking
         private readonly GetMyBookingsUseCase _getMyBookingsUseCase;
 
         public BookingController(
+            CancelBookingUseCase cancelBookingUseCase,
             CompleteBookingUseCase completeBookingUseCase,
             ConfirmBookingUseCase confirmBookingUseCase,
             CreateBookingUseCase createBookingUseCase,
             GetBookingsUseCase getBookingsUseCase,
             GetMyBookingsUseCase getMyBookingsUseCase)
         {
+            _cancelBookingUseCase = cancelBookingUseCase;
             _completeBookingUseCase = completeBookingUseCase;
             _confirmBookingUseCase = confirmBookingUseCase;
             _createBookingUseCase = createBookingUseCase;
@@ -57,6 +61,28 @@ namespace IncotradeBackend.Presentation.Booking
 
             return Ok(SuccessResponse<CreateBookingResponse>
                 .Success("Tạo lịch hẹn thành công.",
+                response)
+            );
+        }
+
+        [Authorize(Roles = "CUSTOMER")]
+        [HttpPatch("cancel-booking")]
+        public async Task<IActionResult> CancelBooking(
+            [FromBody] CancelBookingRequest request)
+        {
+            if (!ModelState.IsValid)
+            {
+                throw new InputValidationException(ModelState);
+            }
+
+            int customerId = GetCurrentCustomerId();
+            var command = CancelBookingMapper.ToCommand(request, customerId);
+            var result = await _cancelBookingUseCase.ExecuteAsync(command);
+
+            var response = CancelBookingMapper.ToResponse(result);
+
+            return Ok(SuccessResponse<CancelBookingResponse>
+                .Success("Hủy lịch hẹn thành công.",
                 response)
             );
         }
