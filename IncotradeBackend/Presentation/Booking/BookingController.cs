@@ -1,5 +1,6 @@
 using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
+using IncotradeBackend.Application.Booking.CompleteBooking;
 using IncotradeBackend.Application.Booking.ConfirmBooking;
 using IncotradeBackend.Application.Booking.CreateBooking;
 using IncotradeBackend.Application.Booking.GetBookings;
@@ -18,17 +19,20 @@ namespace IncotradeBackend.Presentation.Booking
     [Route("api/bookings")]
     public class BookingController : ControllerBase
     {
+        private readonly CompleteBookingUseCase _completeBookingUseCase;
         private readonly ConfirmBookingUseCase _confirmBookingUseCase;
         private readonly CreateBookingUseCase _createBookingUseCase;
         private readonly GetBookingsUseCase _getBookingsUseCase;
         private readonly GetMyBookingsUseCase _getMyBookingsUseCase;
 
         public BookingController(
+            CompleteBookingUseCase completeBookingUseCase,
             ConfirmBookingUseCase confirmBookingUseCase,
             CreateBookingUseCase createBookingUseCase,
             GetBookingsUseCase getBookingsUseCase,
             GetMyBookingsUseCase getMyBookingsUseCase)
         {
+            _completeBookingUseCase = completeBookingUseCase;
             _confirmBookingUseCase = confirmBookingUseCase;
             _createBookingUseCase = createBookingUseCase;
             _getBookingsUseCase = getBookingsUseCase;
@@ -74,6 +78,27 @@ namespace IncotradeBackend.Presentation.Booking
 
             return Ok(SuccessResponse<ConfirmBookingResponse>
                 .Success("Xác nhận lịch hẹn thành công.",
+                response)
+            );
+        }
+
+        [Authorize(Roles = "ADMIN")]
+        [HttpPatch("complete-booking")]
+        public async Task<IActionResult> CompleteBooking(
+            [FromBody] CompleteBookingRequest request)
+        {
+            if (!ModelState.IsValid)
+            {
+                throw new InputValidationException(ModelState);
+            }
+
+            var command = CompleteBookingMapper.ToCommand(request);
+            var result = await _completeBookingUseCase.ExecuteAsync(command);
+
+            var response = CompleteBookingMapper.ToResponse(result);
+
+            return Ok(SuccessResponse<CompleteBookingResponse>
+                .Success("Hoàn thành lịch hẹn thành công.",
                 response)
             );
         }
