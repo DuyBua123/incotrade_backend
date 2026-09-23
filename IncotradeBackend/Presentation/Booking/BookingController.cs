@@ -1,5 +1,6 @@
 using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
+using IncotradeBackend.Application.Booking.ConfirmBooking;
 using IncotradeBackend.Application.Booking.CreateBooking;
 using IncotradeBackend.Application.Booking.GetBookings;
 using IncotradeBackend.Application.Booking.GetMyBookings;
@@ -17,15 +18,18 @@ namespace IncotradeBackend.Presentation.Booking
     [Route("api/bookings")]
     public class BookingController : ControllerBase
     {
+        private readonly ConfirmBookingUseCase _confirmBookingUseCase;
         private readonly CreateBookingUseCase _createBookingUseCase;
         private readonly GetBookingsUseCase _getBookingsUseCase;
         private readonly GetMyBookingsUseCase _getMyBookingsUseCase;
 
         public BookingController(
+            ConfirmBookingUseCase confirmBookingUseCase,
             CreateBookingUseCase createBookingUseCase,
             GetBookingsUseCase getBookingsUseCase,
             GetMyBookingsUseCase getMyBookingsUseCase)
         {
+            _confirmBookingUseCase = confirmBookingUseCase;
             _createBookingUseCase = createBookingUseCase;
             _getBookingsUseCase = getBookingsUseCase;
             _getMyBookingsUseCase = getMyBookingsUseCase;
@@ -49,6 +53,27 @@ namespace IncotradeBackend.Presentation.Booking
 
             return Ok(SuccessResponse<CreateBookingResponse>
                 .Success("Tạo lịch hẹn thành công.",
+                response)
+            );
+        }
+
+        [Authorize(Roles = "ADMIN")]
+        [HttpPatch("confirm-booking")]
+        public async Task<IActionResult> ConfirmBooking(
+            [FromBody] ConfirmBookingRequest request)
+        {
+            if (!ModelState.IsValid)
+            {
+                throw new InputValidationException(ModelState);
+            }
+
+            var command = ConfirmBookingMapper.ToCommand(request);
+            var result = await _confirmBookingUseCase.ExecuteAsync(command);
+
+            var response = ConfirmBookingMapper.ToResponse(result);
+
+            return Ok(SuccessResponse<ConfirmBookingResponse>
+                .Success("Xác nhận lịch hẹn thành công.",
                 response)
             );
         }
