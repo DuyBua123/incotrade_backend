@@ -1,6 +1,7 @@
 using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
 using IncotradeBackend.Application.Booking.CreateBooking;
+using IncotradeBackend.Application.Booking.GetBookings;
 using IncotradeBackend.Application.Booking.GetMyBookings;
 using IncotradeBackend.Infrastructure.Api;
 using IncotradeBackend.Infrastructure.Exceptions;
@@ -17,13 +18,16 @@ namespace IncotradeBackend.Presentation.Booking
     public class BookingController : ControllerBase
     {
         private readonly CreateBookingUseCase _createBookingUseCase;
+        private readonly GetBookingsUseCase _getBookingsUseCase;
         private readonly GetMyBookingsUseCase _getMyBookingsUseCase;
 
         public BookingController(
             CreateBookingUseCase createBookingUseCase,
+            GetBookingsUseCase getBookingsUseCase,
             GetMyBookingsUseCase getMyBookingsUseCase)
         {
             _createBookingUseCase = createBookingUseCase;
+            _getBookingsUseCase = getBookingsUseCase;
             _getMyBookingsUseCase = getMyBookingsUseCase;
         }
 
@@ -45,6 +49,27 @@ namespace IncotradeBackend.Presentation.Booking
 
             return Ok(SuccessResponse<CreateBookingResponse>
                 .Success("Tạo lịch hẹn thành công.",
+                response)
+            );
+        }
+
+        [Authorize(Roles = "ADMIN")]
+        [HttpGet("get-bookings")]
+        public async Task<IActionResult> GetBookings(
+            [FromQuery] GetBookingsRequest request)
+        {
+            if (!ModelState.IsValid)
+            {
+                throw new InputValidationException(ModelState);
+            }
+
+            var command = GetBookingsMapper.ToCommand(request);
+            var result = await _getBookingsUseCase.ExecuteAsync(command);
+
+            var response = GetBookingsMapper.ToResponse(result);
+
+            return Ok(SuccessResponse<PageableResponse<GetBookingsResponse>>
+                .Success("Lấy danh sách lịch hẹn thành công.",
                 response)
             );
         }

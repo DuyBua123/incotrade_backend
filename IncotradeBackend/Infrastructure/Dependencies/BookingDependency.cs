@@ -1,5 +1,6 @@
 using FluentValidation;
 using IncotradeBackend.Application.Booking.CreateBooking;
+using IncotradeBackend.Application.Booking.GetBookings;
 using IncotradeBackend.Application.Booking.GetMyBookings;
 using IncotradeBackend.Presentation.Booking.Request;
 using IncotradeBackend.Presentation.Booking.Validator;
@@ -12,8 +13,10 @@ namespace IncotradeBackend.Infrastructure.Dependencies
             this IServiceCollection services)
         {
             services.AddScoped<IValidator<CreateBookingRequest>, CreateBookingRequestValidator>();
+            services.AddScoped<IValidator<GetBookingsRequest>, GetBookingsRequestValidator>();
             services.AddScoped<IValidator<GetMyBookingsRequest>, GetMyBookingsRequestValidator>();
             services.AddScoped<CreateBookingUseCase>();
+            services.AddScoped<GetBookingsUseCase>();
             services.AddScoped<GetMyBookingsUseCase>();
 
             return services;
