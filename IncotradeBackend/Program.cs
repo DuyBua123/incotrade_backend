@@ -6,9 +6,11 @@ using IncotradeBackend.Infrastructure.Database.Model;
 using IncotradeBackend.Infrastructure.Database.Seed;
 using IncotradeBackend.Infrastructure.Dependencies;
 using IncotradeBackend.Infrastructure.Exceptions;
+using IncotradeBackend.Infrastructure.WebSocket;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.SignalR;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
 
@@ -121,6 +123,19 @@ builder.Services
             //             "API Forbidden",
             //             ErrorCodes.API_FORBIDDEN_ERROR));
             // }
+            OnMessageReceived = context =>
+            {
+                var accessToken = context.Request.Query["access_token"];
+                var path = context.HttpContext.Request.Path;
+
+                if (!string.IsNullOrEmpty(accessToken) &&
+                    path.StartsWithSegments("/hubs/update-booking-status"))
+                {
+                    context.Token = accessToken;
+                }
+
+                return Task.CompletedTask;
+            },
         };
     });
 builder.Services.AddAuthorization();
@@ -130,6 +145,12 @@ builder.Services.AddControllers(options =>
 {
     options.SuppressImplicitRequiredAttributeForNonNullableReferenceTypes = true;
 });
+
+
+// Add SignalR
+builder.Services.AddSignalR();
+
+builder.Services.AddSingleton<IUserIdProvider, SignalrUserIdProvider>();
 
 // Register Auto-run on Startup Service
 builder.Services.AddHostedService<PasswordGenerationService>();
@@ -153,5 +174,7 @@ app.UseAuthentication();
 app.UseAuthorization();
 
 app.MapControllers();
+
+app.MapHub<UpdateBookingStatusNotificationHub>("/hubs/update-booking-status/notification");
 
 app.Run();

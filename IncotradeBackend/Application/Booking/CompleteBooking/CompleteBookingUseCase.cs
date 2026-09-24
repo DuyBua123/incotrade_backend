@@ -1,7 +1,10 @@
+using System.Globalization;
 using IncotradeBackend.Infrastructure.Database;
 using IncotradeBackend.Infrastructure.Database.Enum;
 using IncotradeBackend.Infrastructure.Exceptions;
 using IncotradeBackend.Infrastructure.Mapper.Booking;
+using IncotradeBackend.Infrastructure.WebSocket;
+using Microsoft.AspNetCore.SignalR;
 using Microsoft.EntityFrameworkCore;
 
 namespace IncotradeBackend.Application.Booking.CompleteBooking
@@ -9,10 +12,14 @@ namespace IncotradeBackend.Application.Booking.CompleteBooking
     public class CompleteBookingUseCase
     {
         private readonly AppDbContext _context;
+        private readonly IHubContext<UpdateBookingStatusNotificationHub> _hubContext;
 
-        public CompleteBookingUseCase(AppDbContext context)
+        public CompleteBookingUseCase(
+            AppDbContext context,
+            IHubContext<UpdateBookingStatusNotificationHub> hubContext)
         {
             _context = context;
+            _hubContext = hubContext;
         }
 
         public async Task<CompleteBookingResult> ExecuteAsync(
@@ -35,6 +42,12 @@ namespace IncotradeBackend.Application.Booking.CompleteBooking
             booking.UpdatedAt = DateTimeOffset.UtcNow;
 
             await _context.SaveChangesAsync();
+
+            await _hubContext.Clients
+                .User(booking.CustomerId.ToString())
+                .SendAsync(
+                    "ReceiveUpdatingBookingStatusMessage", 
+                    $"Lịch hẹn vào ngày {booking.ServedDate.ToString("dd/MM/yyyy", CultureInfo.InvariantCulture)} đã được hoàn thành");
 
             return CompleteBookingMapper.ToResult(booking);
         }
