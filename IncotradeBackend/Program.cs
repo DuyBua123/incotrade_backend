@@ -1,6 +1,9 @@
 using System.Text;
 using FluentValidation.AspNetCore;
+using Hangfire;
+using Hangfire.PostgreSql;
 using IncotradeBackend.Infrastructure.Api;
+using IncotradeBackend.Infrastructure.CronJob;
 using IncotradeBackend.Infrastructure.Database;
 using IncotradeBackend.Infrastructure.Database.Model;
 using IncotradeBackend.Infrastructure.Database.Seed;
@@ -48,6 +51,18 @@ builder.Services.Configure<ApiBehaviorOptions>(options =>
 {
     options.SuppressModelStateInvalidFilter = true;
 });
+
+// Register Hangfire
+builder.Services.AddHangfire(config => config
+    .UseSimpleAssemblyNameTypeSerializer()
+    .UseRecommendedSerializerSettings()
+    .UsePostgreSqlStorage(options =>
+    {
+        options.UseNpgsqlConnection(builder.Configuration.GetConnectionString("Dev"));
+    }));
+builder.Services.AddHangfireServer();
+builder.Services.AddScoped<CleanupOverdueBooking>();
+
 
 // Register CORS
 builder.Services.AddCors(options =>
@@ -176,5 +191,26 @@ app.UseAuthorization();
 app.MapControllers();
 
 app.MapHub<UpdateBookingStatusNotificationHub>("/hubs/update-booking-status/notification");
+
+// Cron jobs
+using (var scope = app.Services.CreateScope())
+{
+    var recurringJobManager =
+        scope.ServiceProvider.GetRequiredService<IRecurringJobManager>();
+
+    recurringJobManager.AddOrUpdate<CleanupOverdueBooking>(
+        "database-backup",
+        job => job.ExecuteAsync(),
+        Cron.Minutely,
+        new RecurringJobOptions
+        {
+            TimeZone = TimeZoneInfo.FindSystemTimeZoneById(
+                OperatingSystem.IsWindows()
+                    ? "SE Asia Standard Time"
+                    : "Asia/Ho_Chi_Minh"
+            )
+        }
+    );
+}
 
 app.Run();
