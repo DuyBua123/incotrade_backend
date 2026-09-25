@@ -220,25 +220,5 @@ namespace IncotradeBackend.Presentation.Staff
             );
         }
 
-        [Authorize(Roles = "ADMIN")]
-        [HttpPut("update-staff-schedule")]
-        public async Task<IActionResult> UpdateStaffSchedule(
-            [FromBody] UpdateStaffScheduleRequest request)
-        {
-            if (!ModelState.IsValid)
-            {
-                throw new InputValidationException(ModelState);
-            }
-
-            var command = UpdateStaffScheduleMapper.ToCommand(request);
-            var result = await _updateStaffScheduleUseCase.ExecuteAsync(command);
-
-            var response = UpdateStaffScheduleMapper.ToResponse(result);
-
-            return Ok(SuccessResponse<UpdateStaffScheduleResponse>
-                .Success("Cập nhật lịch làm việc của nhân viên thành công.",
-                response)
-            );
-        }
     }
 }
