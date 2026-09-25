@@ -7,7 +7,6 @@ using IncotradeBackend.Application.Staff.GetStaffSchedule;
 using IncotradeBackend.Application.Staff.GetStaffSchedules;
 using IncotradeBackend.Application.Staff.GetStaffs;
 using IncotradeBackend.Application.Staff.UpdateStaff;
-using IncotradeBackend.Application.Staff.UpdateStaffSchedule;
 using IncotradeBackend.Presentation.Staff.Request;
 using IncotradeBackend.Presentation.Staff.Validator;
 
@@ -35,7 +34,6 @@ namespace IncotradeBackend.Infrastructure.Dependencies
             services.AddScoped<GetStaffSchedulesUseCase>();
             services.AddScoped<GetStaffsUseCase>();
             services.AddScoped<UpdateStaffUseCase>();
-            services.AddScoped<UpdateStaffScheduleUseCase>();
 
             return services;
         }

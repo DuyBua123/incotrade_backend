@@ -6,7 +6,6 @@ using IncotradeBackend.Application.Staff.GetStaffSchedule;
 using IncotradeBackend.Application.Staff.GetStaffSchedules;
 using IncotradeBackend.Application.Staff.GetStaffs;
 using IncotradeBackend.Application.Staff.UpdateStaff;
-using IncotradeBackend.Application.Staff.UpdateStaffSchedule;
 using IncotradeBackend.Infrastructure.Api;
 using IncotradeBackend.Infrastructure.Exceptions;
 using IncotradeBackend.Infrastructure.Mapper.Staff;
@@ -29,7 +28,6 @@ namespace IncotradeBackend.Presentation.Staff
         private readonly GetStaffSchedulesUseCase _getStaffSchedulesUseCase;
         private readonly GetStaffsUseCase _getStaffsUseCase;
         private readonly UpdateStaffUseCase _updateStaffUseCase;
-        private readonly UpdateStaffScheduleUseCase _updateStaffScheduleUseCase;
 
         public StaffController(
             CreateStaffUseCase createStaffUseCase,
@@ -39,8 +37,7 @@ namespace IncotradeBackend.Presentation.Staff
             GetStaffScheduleUseCase getStaffScheduleUseCase,
             GetStaffSchedulesUseCase getStaffSchedulesUseCase,
             GetStaffsUseCase getStaffsUseCase,
-            UpdateStaffUseCase updateStaffUseCase,
-            UpdateStaffScheduleUseCase updateStaffScheduleUseCase)
+            UpdateStaffUseCase updateStaffUseCase)
         {
             _createStaffUseCase = createStaffUseCase;
             _createStaffScheduleUseCase = createStaffScheduleUseCase;
@@ -50,7 +47,6 @@ namespace IncotradeBackend.Presentation.Staff
             _getStaffSchedulesUseCase = getStaffSchedulesUseCase;
             _getStaffsUseCase = getStaffsUseCase;
             _updateStaffUseCase = updateStaffUseCase;
-            _updateStaffScheduleUseCase = updateStaffScheduleUseCase;
         }
 
         [Authorize(Roles = "ADMIN")]
